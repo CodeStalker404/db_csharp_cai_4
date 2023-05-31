@@ -46,18 +46,37 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Profesor.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Include="GestionInstitutoForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="GestionInstitutoForm.Designer.cs">
+      <DependentUpon>GestionInstitutoForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GestionAlumnosForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GestionAlumnosForm.Designer.cs">
+      <DependentUpon>GestionAlumnosForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Alumno.cs" />
+    <Compile Include="Profesor.cs" />
+    <Compile Include="GestionProfesoresForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GestionProfesoresForm.Designer.cs">
+      <DependentUpon>GestionProfesoresForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlDBHelper.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="GestionAlumnosForm.resx">
+      <DependentUpon>GestionAlumnosForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GestionProfesoresForm.resx">
+      <DependentUpon>GestionProfesoresForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GestionInstitutoForm.resx">
+      <DependentUpon>GestionInstitutoForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
