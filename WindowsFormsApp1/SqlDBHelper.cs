@@ -208,8 +208,8 @@ namespace WindowsFormsApp1
             dRegistro[1] = alumno.Nombre;
             dRegistro[2] = alumno.Apellidos;
             dRegistro[3] = alumno.Direccion;
-            dRegistro[3] = alumno.Tlf;
-            dRegistro[4] = alumno.eMail;
+            dRegistro[4] = alumno.Tlf;
+            dRegistro[5] = alumno.eMail;
 
             // Si quisieramos hacerlo por nombre de columna en vez de posición
             // dRegistro["DNI"] = alumno.Dni;
