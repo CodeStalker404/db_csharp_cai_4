@@ -41,6 +41,7 @@
             this.bGestionCursos.TabIndex = 0;
             this.bGestionCursos.Text = "Gestión Cursos";
             this.bGestionCursos.UseVisualStyleBackColor = true;
+            this.bGestionCursos.Click += new System.EventHandler(this.bGestionCursos_Click);
             // 
             // bGestionAlumnos
             // 

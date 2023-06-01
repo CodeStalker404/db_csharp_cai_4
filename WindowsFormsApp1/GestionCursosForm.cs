@@ -14,7 +14,7 @@ using System.Net;
 
 namespace WindowsFormsApp1
 {
-    public partial class GestionAlumnosForm : Form
+    public partial class GestionCursosForm : Form
     {
         // Instancia del objeto que maneja la BD.
         SqlDBHelper sqlDBHelper;
@@ -23,7 +23,7 @@ namespace WindowsFormsApp1
         private int pos;
 
 
-        public GestionAlumnosForm()
+        public GestionCursosForm()
         {
             InitializeComponent();
         }
@@ -43,38 +43,30 @@ namespace WindowsFormsApp1
 
         private void mostrarRegistro(int pos)
         {
-            Alumno alumno;
+            Curso curso;
 
-            alumno = sqlDBHelper.devuelveAlumno(pos);
+            curso = sqlDBHelper.devuelveCurso(pos);
             
-            if(alumno == null)
+            if(curso == null)
             {
-                txtDni.Text = "Sin datos";
+                txtCodigo.Text = "Sin datos";
                 txtNombre.Text = "Sin datos";
-                txtApellidos.Text = "Sin datos";
-                txtDireccion.Text = "Sin datos";
-                txtTelefono.Text = "Sin datos";
-                txtEmail.Text = "Sin datos";
             }
             else
             {
                 //Cogemos el valor de cada una de las columnas del registro y lo ponemos en el txtBox correspondiente
-                txtDni.Text = alumno.Dni;
-                txtNombre.Text = alumno.Nombre;
-                txtApellidos.Text = alumno.Apellidos;
-                txtDireccion.Text = alumno.Direccion;
-                txtTelefono.Text = alumno.Tlf;
-                txtEmail.Text = alumno.eMail;
+                txtCodigo.Text = curso.Codigo;
+                txtNombre.Text = curso.Nombre;
             }
 
             HabilitarDeshabilitarBotones(pos);
 
-            this.lblRegistros.Text = "Registro " + (pos + 1) + " de " + sqlDBHelper.NumAlumnos;
+            this.lblRegistros.Text = "Registro " + (pos + 1) + " de " + sqlDBHelper.NumCursos;
         }
 
         private void HabilitarDeshabilitarBotones(int pos)
         {
-            if(pos == 0 && sqlDBHelper.NumAlumnos == 0)
+            if(pos == 0 && sqlDBHelper.NumCursos == 0)
             { // Si no hay ningún registro se deshabilitan todos
                 this.bPrimero.Enabled = false;
                 this.bAnterior.Enabled = false;
@@ -90,7 +82,7 @@ namespace WindowsFormsApp1
                 this.bUltimo.Enabled = true;
                 this.bSiguiente.Enabled = true;
             }
-            else if (pos >= sqlDBHelper.NumAlumnos - 1)
+            else if (pos >= sqlDBHelper.NumCursos - 1)
             { // En la última posición se deshabilitan los botones Último y Siguiente
                 this.bPrimero.Enabled = true;
                 this.bAnterior.Enabled = true;
@@ -161,22 +153,9 @@ namespace WindowsFormsApp1
                 Button btn = sender as Button;
                 // Vamos a la última posición.
                 // Los registros van del 0 al numero de registros - 1
-                pos = sqlDBHelper.NumAlumnos - 1;
+                pos = sqlDBHelper.NumCursos - 1;
                 mostrarRegistro(pos);
             }
-        }
-
-
-        private bool EsDniValido(string dni)
-        {
-            bool esDniValido = false;
-
-            if(dni.Length == 9)
-            {
-                char ultimoCaracter = dni.ElementAt(dni.Length - 1);
-                esDniValido = Char.IsLetter(ultimoCaracter);
-            }
-            return esDniValido;
         }
 
         private bool SonTodoLetras(string input)
@@ -214,39 +193,21 @@ namespace WindowsFormsApp1
             return true;
         }
 
-        private bool EsEmailValido(string email)
-        {
-            if (string.IsNullOrEmpty(email))
-            {
-                return false;
-            }
-
-            return email.Contains("@") && email.Contains(".");
-        }
-
         private bool SePuedeGuardar()
         {
-            return EsDniValido(txtDni.Text)
-                // El DNI es clave primaria. No puede estar repetido, o lanza excepción.
-                && !sqlDBHelper.DniRepetidoAlumno(txtDni.Text)
-                && SonTodoLetras(txtNombre.Text)
-                && SonTodoLetras(txtApellidos.Text)
-                && !String.IsNullOrEmpty(txtDireccion.Text)
-                && SonTodoNumeros(txtTelefono.Text)
-                && EsEmailValido(txtEmail.Text);
+            return SonTodoNumeros(txtCodigo.Text)
+                // El Codigo es clave primaria. No puede estar repetido, o lanza excepción.
+                && !sqlDBHelper.CodigoRepetidoCurso(txtCodigo.Text)
+                && !String.IsNullOrEmpty(txtNombre.Text);
         }
         
         private bool HayCambiosEnRegistroActual()
         {
-            Alumno alumno = this.sqlDBHelper.devuelveAlumno(pos);
+            Curso curso = this.sqlDBHelper.devuelveCurso(pos);
 
             bool hayCambios =
-                alumno.Dni != txtDni.Text
-                || alumno.Nombre != txtNombre.Text
-                || alumno.Apellidos != txtApellidos.Text
-                || alumno.Direccion != txtDireccion.Text
-                || alumno.Tlf != txtTelefono.Text
-                || alumno.eMail != txtEmail.Text;
+                curso.Codigo != txtCodigo.Text
+                || curso.Nombre != txtNombre.Text;
 
             return hayCambios;
         }
@@ -267,31 +228,27 @@ namespace WindowsFormsApp1
 
         private void bAnyadir_Click(object sender, EventArgs e)
         {
-            txtDni.Clear();
+            txtCodigo.Clear();
             txtNombre.Clear();
-            txtApellidos.Clear();
-            txtTelefono.Clear();
-            txtEmail.Clear();
         }
 
         private void bguardar_Click(object sender, EventArgs e)
         {
             if(SePuedeGuardar())
             {
-                //Creamos el alumno con los datos del formulario
-                Alumno alumno = new Alumno(txtDni.Text, txtNombre.Text,
-                    txtApellidos.Text, txtDireccion.Text, txtTelefono.Text, txtEmail.Text);
+                //Creamos el curso con los datos del formulario
+                Curso curso = new Curso(txtCodigo.Text, txtNombre.Text);
 
-                sqlDBHelper.anyadirAlumno(alumno);
+                sqlDBHelper.anyadirCurso(curso);
 
                 //Actualizamos la posición en la tabla.
-                pos = sqlDBHelper.NumAlumnos - 1;
+                pos = sqlDBHelper.NumCursos - 1;
             }
             else
             {
                 MessageBox.Show(
                     "Hay campos con datos no válidos." +
-                    "\nO el DNI ya figura en la base de datos." +
+                    "\nO el Código ya figura en la base de datos." +
                     "\nRevise los datos introducidos."
                 );
             }
@@ -299,11 +256,10 @@ namespace WindowsFormsApp1
 
         private void bActualizar_Click(object sender, EventArgs e)
         {
-            //Creamos el alumno con los datos del formulario
-            Alumno alumno = new Alumno(txtDni.Text, txtNombre.Text,
-                txtApellidos.Text, txtDireccion.Text, txtTelefono.Text, txtEmail.Text);
+            //Creamos el curso con los datos del formulario
+            Curso curso = new Curso(txtCodigo.Text, txtNombre.Text);
 
-            sqlDBHelper.actualizarAlumno(alumno, pos);
+            sqlDBHelper.actualizarCurso(curso, pos);
         }
 
         private void bEliminar_Click(object sender, EventArgs e)
@@ -321,7 +277,7 @@ namespace WindowsFormsApp1
             // Se elimina el registro si el usuario ha respondido que Sí.
             if (eliminar)
             {
-                sqlDBHelper.eliminarAlumno(pos);
+                sqlDBHelper.eliminarCurso(pos);
 
                 // Nos vamos al primer registro y lo mostramos
                 pos = 0;
@@ -329,17 +285,17 @@ namespace WindowsFormsApp1
             }
         }
 
-        private void txtDni_TextChanged(object sender, EventArgs e)
+        private void txtCodigo_TextChanged(object sender, EventArgs e)
         {
-            TextBox txtDni = sender as TextBox;
-            if (!EsDniValido(txtDni.Text))
+            TextBox txtCodigo = sender as TextBox;
+            if (!SonTodoNumeros(txtCodigo.Text))
             {
-                this.lblValidacionDNI.Text = "DNI inválido. Introduzca un DNI válido.";
-                this.lblValidacionDNI.Visible = true;
+                this.lblValidacionCodigo.Text = "Código inválido.\nIntroduzca un Código válido.";
+                this.lblValidacionCodigo.Visible = true;
             }
             else
             {
-                this.lblValidacionDNI.Visible = false;
+                this.lblValidacionCodigo.Visible = false;
             }
         }
 
@@ -347,72 +303,15 @@ namespace WindowsFormsApp1
         {
             TextBox txtNombre = sender as TextBox;
             Console.WriteLine(txtNombre.Text);
-            if (!SonTodoLetras(txtNombre.Text))
+            if (String.IsNullOrEmpty(txtNombre.Text))
             {
-                this.lblValidacionNombre.Text = "Nombre inválido.\nSolo puede contener letras y espacios.";
+                this.lblValidacionNombre.Text = "Nombre inválido.\nNo puede estar vacío.";
                 this.lblValidacionNombre.Visible = true;
             }
             else
             {
                 this.lblValidacionNombre.Visible = false;
             }
-        }
-
-        private void txtApellidos_TextChanged(object sender, EventArgs e)
-        {
-            TextBox txtApellidos = sender as TextBox;
-            if (!SonTodoLetras(txtApellidos.Text))
-            {
-                this.lblValidacionApellidos.Text = "Apellidos inválidos.\nSolo puede contener letras y espacios.";
-                this.lblValidacionApellidos.Visible = true;
-            }
-            else
-            {
-                this.lblValidacionApellidos.Visible = false;
-            }
-        }
-
-        private void txtTelefono_TextChanged(object sender, EventArgs e)
-        {
-            TextBox txtTelefono = sender as TextBox;
-            if (!SonTodoNumeros(txtTelefono.Text))
-            {
-                this.lblValidacionTlfn.Text = "Teléfono inválido.\nSolo puede contener números.";
-                this.lblValidacionTlfn.Visible = true;
-            }
-            else
-            {
-                this.lblValidacionTlfn.Visible = false;
-            }
-        }
-
-        private void txtEmail_TextChanged(object sender, EventArgs e)
-        {
-            TextBox txtEmail = sender as TextBox;
-            if (!EsEmailValido(txtEmail.Text))
-            {
-                this.lblValidacionEmail.Text = "Email inválido.\nDebe contener una \'@\' y un punto.";
-                this.lblValidacionEmail.Visible = true;
-            }
-            else
-            {
-                this.lblValidacionEmail.Visible = false;
-            }
-        }
-
-        private void txtDireccion_TextChanged(object sender, EventArgs e)
-        {
-            TextBox txtDireccion = sender as TextBox;
-            if (String.IsNullOrEmpty(txtDireccion.Text))
-            {
-                this.lblValidacionDireccion.Text = "Dirección inválida.\nLa dirección no puede estar vacía.";
-                this.lblValidacionDireccion.Visible = true;
-            }
-            else
-            {
-                this.lblValidacionDireccion.Visible = false;
-            }
-
         }
     }
 }

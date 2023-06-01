@@ -17,6 +17,12 @@ namespace WindowsFormsApp1
             InitializeComponent();
         }
 
+        private void bGestionCursos_Click(object sender, EventArgs e)
+        {
+            GestionCursosForm gestionCursosForm = new GestionCursosForm();
+            gestionCursosForm.ShowDialog();
+        }
+
         private void bGestionProfesores_MouseClick(object sender, MouseEventArgs e)
         {
             GestionProfesoresForm gestionProfesoresForm = new GestionProfesoresForm();

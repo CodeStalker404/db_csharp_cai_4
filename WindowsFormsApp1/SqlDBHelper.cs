@@ -75,6 +75,17 @@ namespace WindowsFormsApp1
             // Obtenemos el número de alumnos
             numAlumnos = dsAlumnos.Tables["Alumnos"].Rows.Count;
 
+
+            string cadenaSQLCursos = "SELECT * From Cursos";
+            daCursos = new SqlDataAdapter(cadenaSQLCursos, con);
+
+            dsCursos = new DataSet();
+
+            daCursos.Fill(dsCursos, "Cursos");
+
+            // Obtenemos el número de cursos
+            numCursos = dsCursos.Tables["Cursos"].Rows.Count;
+
             // Cerramos la conexión.
             con.Close();
         }
@@ -131,6 +142,30 @@ namespace WindowsFormsApp1
             return alumno;
         }
 
+        // Método que a partir de una posición en la BD
+        // Devuelve un objeto alumno.
+        // Devuelve null si pos está fuera de los límites
+        public Curso devuelveCurso(int pos)
+        {
+            Curso curso = null;
+
+            if (pos >= 0 && pos < numCursos)
+            {
+                // Objeto que nos permite recoger un registro de la tabla.
+                DataRow dRegistro;
+
+                // Cogemos el registro de la posición pos en la tabla Profesores
+                dRegistro = dsCursos.Tables["Cursos"].Rows[pos];
+
+                // Cogemos el valor de cada una de las columnas del registro
+                // y lo creamos el objeto alumno con esos datos.
+                curso = new Curso(
+                    dRegistro[0].ToString(), dRegistro[1].ToString()
+                );
+            }
+            return curso;
+        }
+
         // Metodos CRUD
 
         // Método que añade un alumno a nuestra BD
@@ -163,7 +198,7 @@ namespace WindowsFormsApp1
         public void anyadirAlumno(Alumno alumno)
         {
             // Creamos un nuevo registro.
-            DataRow dRegistro = dsProfesores.Tables["Alumnos"].NewRow();
+            DataRow dRegistro = dsAlumnos.Tables["Alumnos"].NewRow();
 
             // Metemos los datos en el nuevo registro
             dRegistro[0] = alumno.Dni;
@@ -177,16 +212,40 @@ namespace WindowsFormsApp1
             // dRegistro["DNI"] = alumno.Dni;
 
             // Añadimos el registro al Dataset
-            dsProfesores.Tables["Alumnos"].Rows.Add(dRegistro);
+            dsAlumnos.Tables["Alumnos"].Rows.Add(dRegistro);
 
             // Reconectamos con el dataAdapter y actualizamos la BD
-            SqlCommandBuilder cb = new SqlCommandBuilder(daProfesores);
-            daProfesores.Update(dsProfesores, "Alumnos");
+            SqlCommandBuilder cb = new SqlCommandBuilder(daAlumnos);
+            daAlumnos.Update(dsAlumnos, "Alumnos");
 
             // Actualizamos el número de profesores
-            numProfesores++;
+            numAlumnos++;
         }
-        // TODO seguir copiando métodos para alumnos
+
+        // Método que añade un alumno a nuestra BD
+        public void anyadirCurso(Curso curso)
+        {
+            // Creamos un nuevo registro.
+            DataRow dRegistro = dsCursos.Tables["Cursos"].NewRow();
+
+            // Metemos los datos en el nuevo registro
+            dRegistro[0] = curso.Codigo;
+            dRegistro[1] = curso.Nombre;
+
+            // Si quisieramos hacerlo por nombre de columna en vez de posición
+            // dRegistro["DNI"] = alumno.Dni;
+
+            // Añadimos el registro al Dataset
+            dsCursos.Tables["Cursos"].Rows.Add(dRegistro);
+
+            // Reconectamos con el dataAdapter y actualizamos la BD
+            SqlCommandBuilder cb = new SqlCommandBuilder(daCursos);
+            daCursos.Update(dsCursos, "Cursos");
+
+            // Actualizamos el número de profesores
+            numCursos++;
+        }
+
         // Actualizamos los datos del alumno
         // situado en la posición pos
         public void actualizarProfesor(Profesor profesor, int pos)
@@ -214,7 +273,7 @@ namespace WindowsFormsApp1
         public void actualizarAlumno(Alumno alumno, int pos)
         {
             // Cogemos el registro situado en la posición actual.
-            DataRow dRegistro = dsProfesores.Tables["Alumnos"].Rows[pos];
+            DataRow dRegistro = dsAlumnos.Tables["Alumnos"].Rows[pos];
 
             // Metemos los datos en el registro
             dRegistro[0] = alumno.Dni;
@@ -228,8 +287,27 @@ namespace WindowsFormsApp1
             // dRegistro["DNI"] = alumno.Dni;
 
             // Reconectamos con el dataAdapter y actualizamos la BD
-            SqlCommandBuilder cb = new SqlCommandBuilder(daProfesores);
-            daProfesores.Update(dsProfesores, "Alumnos");
+            SqlCommandBuilder cb = new SqlCommandBuilder(daAlumnos);
+            daAlumnos.Update(dsAlumnos, "Alumnos");
+        }
+
+        // Actualizamos los datos del alumno
+        // situado en la posición pos
+        public void actualizarCurso(Curso curso, int pos)
+        {
+            // Cogemos el registro situado en la posición actual.
+            DataRow dRegistro = dsCursos.Tables["Cursos"].Rows[pos];
+
+            // Metemos los datos en el registro
+            dRegistro[0] = curso.Codigo;
+            dRegistro[1] = curso.Nombre;
+
+            // Si quisieramos hacerlo por nombre de columna en vez de posición
+            // dRegistro["DNI"] = alumno.Dni;
+
+            // Reconectamos con el dataAdapter y actualizamos la BD
+            SqlCommandBuilder cb = new SqlCommandBuilder(daCursos);
+            daCursos.Update(dsCursos, "Cursos");
         }
 
         public void eliminarProfesor(int pos)
@@ -248,7 +326,39 @@ namespace WindowsFormsApp1
             }
         }
 
-        public bool DniRepetido(string dni)
+        public void eliminarAlumno(int pos)
+        {
+            if (numAlumnos > 0)
+            {
+                // Eliminamos el registro situado en la posición actual.
+                dsAlumnos.Tables["Alumnos"].Rows[pos].Delete();
+
+                // Tenemos un alumno menos
+                numAlumnos--;
+
+                // Reconectamos con el dataAdapter y actualizamos la BD
+                SqlCommandBuilder cb = new SqlCommandBuilder(daAlumnos);
+                daAlumnos.Update(dsAlumnos, "Alumnos");
+            }
+        }
+
+        public void eliminarCurso(int pos)
+        {
+            if (numCursos > 0)
+            {
+                // Eliminamos el registro situado en la posición actual.
+                dsCursos.Tables["Cursos"].Rows[pos].Delete();
+
+                // Tenemos un alumno menos
+                numCursos--;
+
+                // Reconectamos con el dataAdapter y actualizamos la BD
+                SqlCommandBuilder cb = new SqlCommandBuilder(daCursos);
+                daCursos.Update(dsCursos, "Cursos");
+            }
+        }
+
+        public bool DniRepetidoProfesor(string dni)
         {
             bool dniRepetido = false;
 
@@ -262,6 +372,38 @@ namespace WindowsFormsApp1
             }
             
             return dniRepetido;
+        }
+
+        public bool DniRepetidoAlumno(string dni)
+        {
+            bool dniRepetido = false;
+
+            for (int i = 0; i < NumAlumnos; i++)
+            {
+                Alumno alumno = devuelveAlumno(i);
+                if (alumno != null && alumno.Dni == dni)
+                {
+                    dniRepetido = true;
+                }
+            }
+
+            return dniRepetido;
+        }
+
+        public bool CodigoRepetidoCurso(string codigo)
+        {
+            bool codigoRepetido = false;
+
+            for (int i = 0; i < NumCursos; i++)
+            {
+                Curso curso = devuelveCurso(i);
+                if (curso != null && curso.Codigo == codigo)
+                {
+                    codigoRepetido = true;
+                }
+            }
+
+            return codigoRepetido;
         }
     }
 }

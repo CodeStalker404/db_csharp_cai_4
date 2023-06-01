@@ -226,7 +226,7 @@ namespace WindowsFormsApp1
         {
             return EsDniValido(txtDni.Text)
                 // El DNI es clave primaria. No puede estar repetido, o lanza excepción.
-                && !sqlDBHelper.DniRepetido(txtDni.Text)
+                && !sqlDBHelper.DniRepetidoProfesor(txtDni.Text)
                 && SonTodoLetras(txtNombre.Text)
                 && SonTodoLetras(txtApellidos.Text)
                 && SonTodoNumeros(txtTelefono.Text)
