@@ -48,7 +48,9 @@ namespace WindowsFormsApp1
             profesor = sqlDBHelper.devuelveProfesor(pos);
             
             if(profesor == null)
-            {
+            { // Valores que se mostrarán si no encuentra ningún registro.
+                // O bien porque está vacía la tabla,
+                // o bien porque no hay profesor en esa posición.
                 txtDni.Text = "Sin datos";
                 txtNombre.Text = "Sin datos";
                 txtApellidos.Text = "Sin datos";
@@ -65,11 +67,14 @@ namespace WindowsFormsApp1
                 txtEmail.Text = profesor.eMail;
             }
 
+            // Botones de movimiento (Primero, Siguiente, Anterior y Último)
             HabilitarDeshabilitarBotones(pos);
 
+            // Texto del label que muestra el resgistro actual
             this.lblRegistros.Text = "Registro " + (pos + 1) + " de " + sqlDBHelper.NumProfesores;
         }
 
+        // Habilita o deshabilita los botones de movimiento dependiendo de la posición.
         private void HabilitarDeshabilitarBotones(int pos)
         {
             if(pos == 0 && sqlDBHelper.NumProfesores == 0)
@@ -164,103 +169,7 @@ namespace WindowsFormsApp1
             }
         }
 
-
-        private bool EsDniValido(string dni)
-        {
-            bool esDniValido = false;
-
-            if(dni.Length == 9)
-            {
-                char ultimoCaracter = dni.ElementAt(dni.Length - 1);
-                esDniValido = Char.IsLetter(ultimoCaracter);
-            }
-            return esDniValido;
-        }
-
-        private bool SonTodoLetras(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-            {
-                return false;
-            }
-
-            foreach (char c in input)
-            {
-                if (!Char.IsLetter(c) && c != ' ')
-                {
-                    Console.WriteLine(c + " apesta");
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        private bool SonTodoNumeros(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-            {
-                return false;
-            }
-
-            foreach (char c in input)
-            {
-                if (!Char.IsDigit(c))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        private bool EsEmailValido(string email)
-        {
-            if (string.IsNullOrEmpty(email))
-            {
-                return false;
-            }
-
-            return email.Contains("@") && email.Contains(".");
-        }
-
-        private bool SePuedeGuardar()
-        {
-            return EsDniValido(txtDni.Text)
-                // El DNI es clave primaria. No puede estar repetido, o lanza excepción.
-                && !sqlDBHelper.DniRepetidoProfesor(txtDni.Text)
-                && SonTodoLetras(txtNombre.Text)
-                && SonTodoLetras(txtApellidos.Text)
-                && SonTodoNumeros(txtTelefono.Text)
-                && EsEmailValido(txtEmail.Text);
-        }
-        
-        private bool HayCambiosEnRegistroActual()
-        {
-            Profesor profesor = this.sqlDBHelper.devuelveProfesor(pos);
-
-            bool hayCambios =
-                profesor.Dni != txtDni.Text
-                || profesor.Nombre != txtNombre.Text
-                || profesor.Apellidos != txtApellidos.Text
-                || profesor.Tlf != txtTelefono.Text
-                || profesor.eMail != txtEmail.Text;
-
-            return hayCambios;
-        }
-
-        private bool SePuedeCambiarDeRegistro()
-        {
-            bool sePuedeCambiar = true;
-            // Si hay cambios en los textbox se pregunta al usuario si está seguro de querer continuar
-            if (HayCambiosEnRegistroActual())
-            {
-                DialogResult result = MessageBox.Show("Hay cambios en el registro actual. Los datos no guardados se perderán.", "¿Desea continuar? ", MessageBoxButtons.YesNo);
-
-                sePuedeCambiar = result.Equals(DialogResult.Yes);
-            }
-
-            return sePuedeCambiar;
-        }
-
+        // Elimina el contenido de los TextBox
         private void bAnyadir_Click(object sender, EventArgs e)
         {
             txtDni.Clear();
@@ -325,6 +234,10 @@ namespace WindowsFormsApp1
             }
         }
 
+        // TextChanged
+
+        // En el evento TextChanged se comprueban las modificaciones
+        // para saber si es válido o no el valor del TextBox.
         private void txtDni_TextChanged(object sender, EventArgs e)
         {
             TextBox txtDni = sender as TextBox;
@@ -394,6 +307,106 @@ namespace WindowsFormsApp1
             {
                 this.lblValidacionEmail.Visible = false;
             }
+        }
+
+
+
+        // Métodos para validaciones
+
+        private bool EsDniValido(string dni)
+        {
+            bool esDniValido = false;
+
+            if (dni.Length == 9)
+            {
+                char ultimoCaracter = dni.ElementAt(dni.Length - 1);
+                esDniValido = Char.IsLetter(ultimoCaracter);
+            }
+            return esDniValido;
+        }
+
+        private bool SonTodoLetras(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return false;
+            }
+
+            foreach (char c in input)
+            {
+                if (!Char.IsLetter(c) && c != ' ')
+                {
+                    Console.WriteLine(c + " apesta");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private bool SonTodoNumeros(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return false;
+            }
+
+            foreach (char c in input)
+            {
+                if (!Char.IsDigit(c))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private bool EsEmailValido(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return false;
+            }
+
+            return email.Contains("@") && email.Contains(".");
+        }
+
+        private bool SePuedeGuardar()
+        {
+            return EsDniValido(txtDni.Text)
+                // El DNI es clave primaria. No puede estar repetido, o lanza excepción.
+                && !sqlDBHelper.DniRepetidoProfesor(txtDni.Text)
+                && SonTodoLetras(txtNombre.Text)
+                && SonTodoLetras(txtApellidos.Text)
+                && SonTodoNumeros(txtTelefono.Text)
+                && EsEmailValido(txtEmail.Text);
+        }
+
+        private bool HayCambiosEnRegistroActual()
+        {
+            Profesor profesor = this.sqlDBHelper.devuelveProfesor(pos);
+
+            bool hayCambios =
+                profesor.Dni != txtDni.Text
+                || profesor.Nombre != txtNombre.Text
+                || profesor.Apellidos != txtApellidos.Text
+                || profesor.Tlf != txtTelefono.Text
+                || profesor.eMail != txtEmail.Text;
+
+            return hayCambios;
+        }
+
+        private bool SePuedeCambiarDeRegistro()
+        {
+            bool sePuedeCambiar = true;
+            // Si hay cambios en los textbox se pregunta al usuario si está seguro de querer continuar
+            if (HayCambiosEnRegistroActual())
+            {
+                DialogResult result = MessageBox.Show("Hay cambios en el registro actual. Los datos no guardados se perderán.", "¿Desea continuar? ", MessageBoxButtons.YesNo);
+
+                sePuedeCambiar = result.Equals(DialogResult.Yes);
+            }
+
+            return sePuedeCambiar;
         }
     }
 }

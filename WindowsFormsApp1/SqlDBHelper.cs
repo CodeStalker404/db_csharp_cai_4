@@ -54,6 +54,7 @@ namespace WindowsFormsApp1
             // Abrimos la conexión.
             con.Open();
 
+
             string cadenaSQLProfesores = "SELECT * From Profesores";
             daProfesores = new SqlDataAdapter(cadenaSQLProfesores, con);
 
@@ -65,6 +66,7 @@ namespace WindowsFormsApp1
             numProfesores = dsProfesores.Tables["Profesores"].Rows.Count;
 
 
+
             string cadenaSQLAlumnos = "SELECT * From Alumnos";
             daAlumnos = new SqlDataAdapter(cadenaSQLAlumnos, con);
 
@@ -74,6 +76,7 @@ namespace WindowsFormsApp1
 
             // Obtenemos el número de alumnos
             numAlumnos = dsAlumnos.Tables["Alumnos"].Rows.Count;
+
 
 
             string cadenaSQLCursos = "SELECT * From Cursos";
@@ -92,7 +95,7 @@ namespace WindowsFormsApp1
 
 
         // Método que a partir de una posición en la BD
-        // Devuelve un objeto alumno.
+        // Devuelve un objeto profesor.
         // Devuelve null si pos está fuera de los límites
         public Profesor devuelveProfesor(int pos)
         {
@@ -143,7 +146,7 @@ namespace WindowsFormsApp1
         }
 
         // Método que a partir de una posición en la BD
-        // Devuelve un objeto alumno.
+        // Devuelve un objeto curso.
         // Devuelve null si pos está fuera de los límites
         public Curso devuelveCurso(int pos)
         {
@@ -158,7 +161,7 @@ namespace WindowsFormsApp1
                 dRegistro = dsCursos.Tables["Cursos"].Rows[pos];
 
                 // Cogemos el valor de cada una de las columnas del registro
-                // y lo creamos el objeto alumno con esos datos.
+                // y lo creamos el objeto curso con esos datos.
                 curso = new Curso(
                     dRegistro[0].ToString(), dRegistro[1].ToString()
                 );
@@ -182,7 +185,7 @@ namespace WindowsFormsApp1
             dRegistro[4] = profesor.eMail;
 
             // Si quisieramos hacerlo por nombre de columna en vez de posición
-            // dRegistro["DNI"] = alumno.Dni;
+            // dRegistro["DNI"] = profesor.Dni;
 
             // Añadimos el registro al Dataset
             dsProfesores.Tables["Profesores"].Rows.Add(dRegistro);
@@ -218,11 +221,11 @@ namespace WindowsFormsApp1
             SqlCommandBuilder cb = new SqlCommandBuilder(daAlumnos);
             daAlumnos.Update(dsAlumnos, "Alumnos");
 
-            // Actualizamos el número de profesores
+            // Actualizamos el número de alumnos
             numAlumnos++;
         }
 
-        // Método que añade un alumno a nuestra BD
+        // Método que añade un curso a nuestra BD
         public void anyadirCurso(Curso curso)
         {
             // Creamos un nuevo registro.
@@ -232,9 +235,6 @@ namespace WindowsFormsApp1
             dRegistro[0] = curso.Codigo;
             dRegistro[1] = curso.Nombre;
 
-            // Si quisieramos hacerlo por nombre de columna en vez de posición
-            // dRegistro["DNI"] = alumno.Dni;
-
             // Añadimos el registro al Dataset
             dsCursos.Tables["Cursos"].Rows.Add(dRegistro);
 
@@ -242,11 +242,11 @@ namespace WindowsFormsApp1
             SqlCommandBuilder cb = new SqlCommandBuilder(daCursos);
             daCursos.Update(dsCursos, "Cursos");
 
-            // Actualizamos el número de profesores
+            // Actualizamos el número de cursos
             numCursos++;
         }
 
-        // Actualizamos los datos del alumno
+        // Actualizamos los datos del profesor
         // situado en la posición pos
         public void actualizarProfesor(Profesor profesor, int pos)
         {
@@ -261,7 +261,7 @@ namespace WindowsFormsApp1
             dRegistro[4] = profesor.eMail;
 
             // Si quisieramos hacerlo por nombre de columna en vez de posición
-            // dRegistro["DNI"] = alumno.Dni;
+            // dRegistro["DNI"] = profesor.Dni;
 
             // Reconectamos con el dataAdapter y actualizamos la BD
             SqlCommandBuilder cb = new SqlCommandBuilder(daProfesores);
@@ -283,15 +283,12 @@ namespace WindowsFormsApp1
             dRegistro[4] = alumno.Tlf;
             dRegistro[5] = alumno.eMail;
 
-            // Si quisieramos hacerlo por nombre de columna en vez de posición
-            // dRegistro["DNI"] = alumno.Dni;
-
             // Reconectamos con el dataAdapter y actualizamos la BD
             SqlCommandBuilder cb = new SqlCommandBuilder(daAlumnos);
             daAlumnos.Update(dsAlumnos, "Alumnos");
         }
 
-        // Actualizamos los datos del alumno
+        // Actualizamos los datos del curso
         // situado en la posición pos
         public void actualizarCurso(Curso curso, int pos)
         {
@@ -301,9 +298,6 @@ namespace WindowsFormsApp1
             // Metemos los datos en el registro
             dRegistro[0] = curso.Codigo;
             dRegistro[1] = curso.Nombre;
-
-            // Si quisieramos hacerlo por nombre de columna en vez de posición
-            // dRegistro["DNI"] = alumno.Dni;
 
             // Reconectamos con el dataAdapter y actualizamos la BD
             SqlCommandBuilder cb = new SqlCommandBuilder(daCursos);
@@ -317,7 +311,7 @@ namespace WindowsFormsApp1
                 // Eliminamos el registro situado en la posición actual.
                 dsProfesores.Tables["Profesores"].Rows[pos].Delete();
 
-                // Tenemos un alumno menos
+                // Tenemos un profesor menos
                 numProfesores--;
 
                 // Reconectamos con el dataAdapter y actualizamos la BD
@@ -349,7 +343,7 @@ namespace WindowsFormsApp1
                 // Eliminamos el registro situado en la posición actual.
                 dsCursos.Tables["Cursos"].Rows[pos].Delete();
 
-                // Tenemos un alumno menos
+                // Tenemos un curso menos
                 numCursos--;
 
                 // Reconectamos con el dataAdapter y actualizamos la BD

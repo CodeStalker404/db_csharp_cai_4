@@ -48,7 +48,7 @@ namespace WindowsFormsApp1
             curso = sqlDBHelper.devuelveCurso(pos);
             
             if(curso == null)
-            {
+            { // Valores que se mostrarán si no encuentra ningún registro
                 txtCodigo.Text = "Sin datos";
                 txtNombre.Text = "Sin datos";
             }
@@ -59,8 +59,10 @@ namespace WindowsFormsApp1
                 txtNombre.Text = curso.Nombre;
             }
 
+            // Botones de movimiento (Primero, Siguiente, Anterior y Último)
             HabilitarDeshabilitarBotones(pos);
 
+            // Texto del label que muestra el resgistro actual
             this.lblRegistros.Text = "Registro " + (pos + 1) + " de " + sqlDBHelper.NumCursos;
         }
 
@@ -158,74 +160,6 @@ namespace WindowsFormsApp1
             }
         }
 
-        private bool SonTodoLetras(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-            {
-                return false;
-            }
-
-            foreach (char c in input)
-            {
-                if (!Char.IsLetter(c) && c != ' ')
-                {
-                    Console.WriteLine(c + " apesta");
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        private bool SonTodoNumeros(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-            {
-                return false;
-            }
-
-            foreach (char c in input)
-            {
-                if (!Char.IsDigit(c))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        private bool SePuedeGuardar()
-        {
-            return SonTodoNumeros(txtCodigo.Text)
-                // El Codigo es clave primaria. No puede estar repetido, o lanza excepción.
-                && !sqlDBHelper.CodigoRepetidoCurso(txtCodigo.Text)
-                && !String.IsNullOrEmpty(txtNombre.Text);
-        }
-        
-        private bool HayCambiosEnRegistroActual()
-        {
-            Curso curso = this.sqlDBHelper.devuelveCurso(pos);
-
-            bool hayCambios =
-                curso.Codigo != txtCodigo.Text
-                || curso.Nombre != txtNombre.Text;
-
-            return hayCambios;
-        }
-
-        private bool SePuedeCambiarDeRegistro()
-        {
-            bool sePuedeCambiar = true;
-            // Si hay cambios en los textbox se pregunta al usuario si está seguro de querer continuar
-            if (HayCambiosEnRegistroActual())
-            {
-                DialogResult result = MessageBox.Show("Hay cambios en el registro actual. Los datos no guardados se perderán.", "¿Desea continuar? ", MessageBoxButtons.YesNo);
-
-                sePuedeCambiar = result.Equals(DialogResult.Yes);
-            }
-
-            return sePuedeCambiar;
-        }
-
         private void bAnyadir_Click(object sender, EventArgs e)
         {
             txtCodigo.Clear();
@@ -285,6 +219,12 @@ namespace WindowsFormsApp1
             }
         }
 
+
+        // TextChanged
+
+        // En el evento TextChanged se comprueban las modificaciones
+        // para saber si es válido o no el valor del TextBox.
+
         private void txtCodigo_TextChanged(object sender, EventArgs e)
         {
             TextBox txtCodigo = sender as TextBox;
@@ -312,6 +252,60 @@ namespace WindowsFormsApp1
             {
                 this.lblValidacionNombre.Visible = false;
             }
+        }
+
+
+
+        // Métodos para validaciones
+
+        private bool SonTodoNumeros(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return false;
+            }
+
+            foreach (char c in input)
+            {
+                if (!Char.IsDigit(c))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private bool SePuedeGuardar()
+        {
+            return SonTodoNumeros(txtCodigo.Text)
+                // El Codigo es clave primaria. No puede estar repetido, o lanza excepción.
+                && !sqlDBHelper.CodigoRepetidoCurso(txtCodigo.Text)
+                && !String.IsNullOrEmpty(txtNombre.Text);
+        }
+
+        private bool HayCambiosEnRegistroActual()
+        {
+            Curso curso = this.sqlDBHelper.devuelveCurso(pos);
+
+            bool hayCambios =
+                curso.Codigo != txtCodigo.Text
+                || curso.Nombre != txtNombre.Text;
+
+            return hayCambios;
+        }
+
+        private bool SePuedeCambiarDeRegistro()
+        {
+            bool sePuedeCambiar = true;
+            // Si hay cambios en los textbox se pregunta al usuario si está seguro de querer continuar
+            if (HayCambiosEnRegistroActual())
+            {
+                DialogResult result = MessageBox.Show("Hay cambios en el registro actual. Los datos no guardados se perderán.", "¿Desea continuar? ", MessageBoxButtons.YesNo);
+
+                sePuedeCambiar = result.Equals(DialogResult.Yes);
+            }
+
+            return sePuedeCambiar;
         }
     }
 }
